@@ -17,7 +17,8 @@ function Dashboard() {
   const [platform, setPlatform] = useState('both');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const { user } = useAuth();
+  // eslint-disable-next-line
+  const auth = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();

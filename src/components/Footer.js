@@ -7,9 +7,9 @@ function Footer() {
     <footer className="App-footer">
       <p>© {currentYear} Social Media Writer | AI-Powered Content Generator</p>
       <div className="footer-links">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-        <a href="#">Contact Us</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms of Service</a>
+        <a href="/contact">Contact Us</a>
       </div>
     </footer>
   );
