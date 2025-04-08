@@ -4,6 +4,7 @@ A modern React application that helps users generate customized content for Twit
 
 ## Features
 
+- User authentication with Google via Supabase
 - Generate content for Twitter and LinkedIn platforms
 - Analyze user's previous posts to understand their writing style
 - Customize content based on the platform's specific requirements
@@ -16,6 +17,19 @@ A modern React application that helps users generate customized content for Twit
 
 - Node.js (version 12 or higher)
 - npm (usually comes with Node.js)
+- Supabase account (for authentication)
+
+### Supabase Setup
+
+1. Create a new project on [Supabase](https://supabase.com)
+2. In the Supabase dashboard, go to Authentication > Providers and enable Google authentication
+3. Configure your Google OAuth credentials (follow Supabase documentation)
+4. Copy your Supabase URL and anonymous key from the API settings
+5. Create a `.env` file in the project root and add:
+   ```
+   REACT_APP_SUPABASE_URL=your-supabase-url
+   REACT_APP_SUPABASE_ANON_KEY=your-supabase-anon-key
+   ```
 
 ### Installation
 
@@ -43,11 +57,12 @@ A modern React application that helps users generate customized content for Twit
 
 ## How to Use
 
-1. Enter the topic or idea you want to write about in the first text area.
-2. Optionally, paste some of your previous posts to help the system understand your writing style.
-3. Select the platform(s) you want to generate content for.
-4. Click "Generate Content" and wait for the results.
-5. Use the "Copy to Clipboard" button to copy the generated content.
+1. Sign in with your Google account
+2. Enter the topic or idea you want to write about in the first text area
+3. Optionally, paste some of your previous posts to help the system understand your writing style
+4. Select the platform(s) you want to generate content for
+5. Click "Generate Content" and wait for the results
+6. Use the "Copy to Clipboard" button to copy the generated content
 
 ## Future Improvements
 

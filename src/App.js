@@ -1,17 +1,23 @@
 import { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import './App.css';
 import PostForm from './components/PostForm';
 import ResultDisplay from './components/ResultDisplay';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import Login from './components/Login';
+import UserProfile from './components/UserProfile';
+import PrivateRoute from './components/PrivateRoute';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
-function App() {
+function Dashboard() {
   const [userInput, setUserInput] = useState('');
   const [samplePosts, setSamplePosts] = useState('');
   const [generatedContent, setGeneratedContent] = useState({ twitter: '', linkedin: '' });
   const [platform, setPlatform] = useState('both');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const { user } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -86,6 +92,7 @@ function App() {
   return (
     <div className="App">
       <Header />
+      <UserProfile />
       
       <main className="App-main">
         <PostForm 
@@ -118,6 +125,27 @@ function App() {
       
       <Footer />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route 
+            path="/" 
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            } 
+          />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </AuthProvider>
+    </Router>
   );
 }
 
