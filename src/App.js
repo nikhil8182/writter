@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import './App.css';
 import PostForm from './components/PostForm';
@@ -9,6 +9,7 @@ import Login from './components/Login';
 import UserProfile from './components/UserProfile';
 import PrivateRoute from './components/PrivateRoute';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { generateContent, checkApiStatus } from './services/api';
 
 function Dashboard() {
   const [userInput, setUserInput] = useState('');
@@ -17,35 +18,63 @@ function Dashboard() {
   const [platform, setPlatform] = useState('both');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [apiAvailable, setApiAvailable] = useState(true);
   // eslint-disable-next-line
   const auth = useAuth();
 
-  const handleSubmit = (e) => {
+  // Check if API is available on component mount
+  useEffect(() => {
+    const checkApi = async () => {
+      const isAvailable = await checkApiStatus();
+      setApiAvailable(isAvailable);
+      if (!isAvailable) {
+        setError('API server is not available. Content will be generated using mock data.');
+      }
+    };
+    
+    checkApi();
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
     
-    // Mock API call for content generation
-    // In a real app, this would call your backend service
-    setTimeout(() => {
-      try {
-        // Analyze user input and sample posts
-        const analysisResult = analyzeUserInput(userInput, samplePosts);
-        
-        const twitterContent = generateTwitterPost(userInput, analysisResult);
-        const linkedinContent = generateLinkedInPost(userInput, analysisResult);
-        
-        setGeneratedContent({
-          twitter: twitterContent,
-          linkedin: linkedinContent
-        });
-      } catch (error) {
-        setError('Failed to generate content. Please try again.');
-        console.error(error);
-      } finally {
-        setIsLoading(false);
+    try {
+      let content;
+      
+      if (apiAvailable) {
+        // Use the real API if it's available
+        content = await generateContent(userInput, samplePosts, platform);
+      } else {
+        // Use mock implementation if API is not available
+        content = await mockGenerateContent();
       }
-    }, 1500);
+      
+      setGeneratedContent(content);
+    } catch (error) {
+      console.error('Error:', error);
+      setError(error.message || 'Failed to generate content. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Mock functions for fallback content generation
+  const mockGenerateContent = async () => {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Analyze user input and sample posts
+    const analysisResult = analyzeUserInput(userInput, samplePosts);
+    
+    const twitterContent = generateTwitterPost(userInput, analysisResult);
+    const linkedinContent = generateLinkedInPost(userInput, analysisResult);
+    
+    return {
+      twitter: platform === 'linkedin' ? null : twitterContent,
+      linkedin: platform === 'twitter' ? null : linkedinContent
+    };
   };
 
   // Mock functions for content analysis and generation
@@ -96,6 +125,12 @@ function Dashboard() {
       <UserProfile />
       
       <main className="App-main">
+        {!apiAvailable && (
+          <div className="api-warning">
+            <p>API server is not available. Using mock data for content generation.</p>
+          </div>
+        )}
+        
         <PostForm 
           userInput={userInput}
           setUserInput={setUserInput}
